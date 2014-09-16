@@ -225,7 +225,7 @@ local music = {
 	--{name="Mass_Effect_Uncharted_Worlds", length=2*60+29, gain=music_volume},
 	{name="EtherealShort", length=3*60+4, gain=music_volume*.7},
 	{name="FarawayShort", length=3*60+5, gain=music_volume*.7},
-	{name="dark_ambiance", length=44, gain=music_volume}
+	{name="dark_ambiance", length=44, gain=music_volume},
 	{name="echos", length=2*60+25, gain=music_volume}
 }
 
