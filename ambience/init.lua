@@ -226,24 +226,21 @@ local music = {
 	{name="EtherealShort", length=3*60+4, gain=music_volume*.7},
 	{name="FarawayShort", length=3*60+5, gain=music_volume*.7},
 	{name="dark_ambiance", length=44, gain=music_volume}
+	{name="echos", length=2*60+25, gain=music_volume}
 }
 
 local is_daytime = function()
-	return (minetest.get_timeofday() > 0.2 and  minetest.get_timeofday() < 0.8)
-end
-
-local nodes_in_range = function(pos, search_distance, node_name)
-	minp = {x=pos.x-search_distance,y=pos.y-search_distance, z=pos.z-search_distance}
-	maxp = {x=pos.x+search_distance,y=pos.y+search_distance, z=pos.z+search_distance}
-	nodes = minetest.find_nodes_in_area(minp, maxp, node_name)
-	--minetest.chat_send_all("Found (" .. node_name .. ": " .. #nodes .. ")")
-	return #nodes
+	local time = minetest.get_timeofday()
+	return time > 0.2 and time < 0.8
 end
 
 local nodes_in_coords = function(minp, maxp, node_name)
 	nodes = minetest.find_nodes_in_area(minp, maxp, node_name)
-	--minetest.chat_send_all("Found (" .. node_name .. ": " .. #nodes .. ")")
 	return #nodes
+end
+
+local nodes_in_range = function(pos, search_distance, node_name)
+	return nodes_in_coords(vector.subtract(pos, search_distance), vector.add(pos, search_distance), node_name)
 end
 
 local atleast_nodes_in_grid = function(pos, search_distance, height, node_name, threshold)
@@ -747,20 +744,10 @@ minetest.register_globalstep(function(dtime)
 		stop_sound(ambiences, player)
 		for _,ambience in pairs(ambiences) do
 			if math.random(1, 1000) <= ambience.frequency then			
---				if(played_on_start) then
---				--	minetest.chat_send_all("playedOnStart "  )
---				else
---				--	minetest.chat_send_all("FALSEplayedOnStart "  )
---				end
 				if ambience.on_start ~= nil and played_on_start == false then
 					played_on_start = true
-					minetest.sound_play(ambience.on_start, {to_player=player:get_player_name(),gain=SOUNDVOLUME})					
+					minetest.sound_play(ambience.on_start, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
 				end
-			--	minetest.chat_send_all("ambience: " ..ambience )
-			--	if ambience.on_start ~= nil and played_on_start_flying == false then
-			--		played_on_start_flying = true
-			--		minetest.sound_play(ambience.on_start, {to_player=player:get_player_name()})					
-			--	end
 				local is_music =false
 				if ambience.is_music ~= nil then
 					is_music = true
@@ -777,19 +764,16 @@ minetest.register_chatcommand("svol", {
 	privs = {server=true},
 	func = function(name, param)
 		SOUNDVOLUME = param
-	--	local player = minetest.get_player_by_name(name)
-	--	ambiences = get_ambience(player)
-	--	stop_sound({}, player)
 		minetest.chat_send_player(name, "Sound volume set.")
-	end,		})
+	end,
+})
+
 minetest.register_chatcommand("mvol", {
 	params = "<mvol>",
 	description = "set volume of music, default 1 normal volume.",
 	privs = {server=true},
 	func = function(name, param)
 		MUSICVOLUME = param
-	--	local player = minetest.get_player_by_name(name)
-	--	stop_sound({}, player)
-	--	ambiences = get_ambience(player)	
 		minetest.chat_send_player(name, "Music volume set.")
-	end,		})	
+	end,
+})	
