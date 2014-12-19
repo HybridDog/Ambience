@@ -16,35 +16,35 @@ local max_frequency_all = 1000 --the larger you make this number the lest freque
 --for frequencies below use a number between 0 and max_frequency_all
 --for volumes below, use a number between 0.0 and 1, the larger the number the louder the sounds
 local night_frequency = 20  --owls, wolves 
-local night_volume = 0.9  
+local night_volume = 0.8
 local night_frequent_frequency = 150  --crickets
-local night_frequent_volume = 0.9
+local night_frequent_volume = 0.8
 local day_frequency = 80  --crow, bluejay, cardinal
-local day_volume = 0.9 
+local day_volume = 0.8
 local day_frequent_frequency = 250  --crow, bluejay, cardinal
 local day_frequent_volume = 0.18
 local cave_frequency = 10  --bats
-local cave_volume = 1.0  
+local cave_volume = 0.8
 local cave_frequent_frequency = 70  --drops of water dripping
-local cave_frequent_volume = 1.0 
+local cave_frequent_volume = 0.8 
 local beach_frequency = 20  --seagulls
-local beach_volume = 1.0  
+local beach_volume = 0.8  
 local beach_frequent_frequency = 1000  --waves
-local beach_frequent_volume = 1.0 
+local beach_frequent_volume = 0.8 
 local water_frequent_frequency = 1000  --water sounds
-local water_frequent_volume = 1.0 
+local water_frequent_volume = 0.8 
 local desert_frequency = 20  --coyote
-local desert_volume = 1.0  
+local desert_volume = 0.8  
 local desert_frequent_frequency = 700  --desertwind
-local desert_frequent_volume = 1.0 
+local desert_frequent_volume = 0.8 
 local swimming_frequent_frequency = 1000  --swimming splashes
-local swimming_frequent_volume = 1.0 
-local water_surface_volume = 1.0   -- sloshing water
-local lava_volume = 1.0 --lava
+local swimming_frequent_volume = 0.8 
+local water_surface_volume = 0.8   -- sloshing water
+local lava_volume = 0.8 --lava
 local flowing_water_volume = .4  --waterfall
 local splashing_water_volume = 1
 local music_frequency = 17  --music (suggestion: keep this one low like around 6)
-local music_volume = 0.3 
+local music_volume = 0.1
 
 --End of Config
 ----------------------------------------------------------------------------------------------------
@@ -235,8 +235,7 @@ local is_daytime = function()
 end
 
 local nodes_in_coords = function(minp, maxp, node_name)
-	nodes = minetest.find_nodes_in_area(minp, maxp, node_name)
-	return #nodes
+	return #minetest.find_nodes_in_area(minp, maxp, node_name)
 end
 
 local nodes_in_range = function(pos, search_distance, node_name)
@@ -245,40 +244,21 @@ end
 
 local atleast_nodes_in_grid = function(pos, search_distance, height, node_name, threshold)
 	counter = counter +1
---	minetest.chat_send_all("counter: (" .. counter .. ")")
-	local minp = {x=pos.x-search_distance,y=height, z=pos.z+20}
-	local maxp = {x=pos.x+search_distance,y=height, z=pos.z+20}
-	local nodes = minetest.find_nodes_in_area(minp, maxp, node_name)
---	minetest.chat_send_all("z+Found (" .. node_name .. ": " .. #nodes .. ")")
-	if #nodes >= threshold then
-		return true
+	local totalnodes
+	for _,ps in pairs({
+		{{-search_distance, 20}, {search_distance, 20}},
+		{{-search_distance, -20}, {search_distance, -20}},
+		{{20, -search_distance}, {20, search_distance}},
+		{{-20, -search_distance}, {-20, search_distance}},
+	}) do
+		local x1,z1 = unpack(ps[1])
+		local x2,z2 = unpack(ps[2])
+		local nodes = minetest.find_nodes_in_area({x=pos.x+x1, y=height, z=pos.z+z1}, {x=pos.x+x2, y=height, z=pos.z+z2}, node_name)
+		if #nodes >= threshold then
+			return true
+		end
+		totalnodes = totalnodes + #nodes
 	end
-	local totalnodes = #nodes
-	minp = {x=pos.x-search_distance,y=height, z=pos.z-20}
-	maxp = {x=pos.x+search_distance,y=height, z=pos.z-20}
-	nodes = minetest.find_nodes_in_area(minp, maxp, node_name)
---	minetest.chat_send_all("z-Found (" .. node_name .. ": " .. #nodes .. ")")
-	if #nodes >= threshold then
-		return true
-	end
-	totalnodes = totalnodes + #nodes
-	maxp = {x=pos.x+20,y=height, z=pos.z+search_distance}
-	minp = {x=pos.x+20,y=height, z=pos.z-search_distance}
-	nodes = minetest.find_nodes_in_area(minp, maxp, node_name)	
---	minetest.chat_send_all("x+Found (" .. node_name .. ": " .. #nodes .. ")")
-	if #nodes >= threshold then
-		return true
-	end
-	totalnodes = totalnodes + #nodes
-	maxp = {x=pos.x-20,y=height, z=pos.z+search_distance}
-	minp = {x=pos.x-20,y=height, z=pos.z-search_distance}
-	nodes = minetest.find_nodes_in_area(minp, maxp, node_name)	
---	minetest.chat_send_all("x+Found (" .. node_name .. ": " .. #nodes .. ")")	
-	if #nodes >= threshold then
-		return true
-	end
-	totalnodes = totalnodes + #nodes
---	minetest.chat_send_all("Found total(" .. totalnodes .. ")")
 	if totalnodes >= threshold*2 then
 		return true
 	end	
@@ -442,9 +422,7 @@ local get_ambience = function(player)
 	end
 	
 	
-	desert_in_range = (nodes_in_range(pos, 6, "default:desert_sand")+nodes_in_range(pos, 6, "default:desert_stone"))
-	--minetest.chat_send_all("desertcount: " .. desert_in_range .. ",".. pos.y )
-	if  desert_in_range >250 then
+	if  (nodes_in_range(pos, 6, "default:desert_sand")+nodes_in_range(pos, 6, "default:desert_stone")) >250 then
 		if music then
 			return {desert=desert, desert_frequent=desert_frequent, music=music}
 		else
