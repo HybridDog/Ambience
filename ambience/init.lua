@@ -244,7 +244,7 @@ end
 
 local atleast_nodes_in_grid = function(pos, search_distance, height, node_name, threshold)
 	counter = counter +1
-	local totalnodes
+	local totalnodes = 0
 	for _,ps in pairs({
 		{{-search_distance, 20}, {search_distance, 20}},
 		{{-search_distance, -20}, {search_distance, -20}},
