@@ -457,15 +457,22 @@ local get_ambience = function(player)
 	end
 end
 
--- an own sound play function
-local active_sounds = {}
-local function sound_play(sound, params)
+-- override the minetest.sound_play function
+local old_sound_play = minetest.sound_play
+minetest.sound_play = function(sound, params, ...)
 	if params.gain == 0 then
 		return
 	end
+	return old_sound_play(sound, params, ...)
+end
+
+-- an own sound play function
+local active_sounds = {}
+local function sound_play(sound, params)
 	local sound = minetest.sound_play(sound, params)
 	local length = params.length
-	if length
+	if sound
+	and length
 	and length > 10 then
 		local time = tonumber(os.clock())
 		active_sounds[time] = sound
@@ -653,4 +660,4 @@ minetest.register_chatcommand("mvol", {
 		MUSICVOLUME = param
 		minetest.chat_send_player(name, "Music volume set.")
 	end,
-})	
+})
