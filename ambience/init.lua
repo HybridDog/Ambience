@@ -460,7 +460,8 @@ end
 -- override the minetest.sound_play function
 local old_sound_play = minetest.sound_play
 minetest.sound_play = function(sound, params, ...)
-	if params.gain == 0 then
+	if params
+	and params.gain == 0 then
 		return
 	end
 	return old_sound_play(sound, params, ...)
@@ -470,7 +471,7 @@ end
 local active_sounds = {}
 local function sound_play(sound, params)
 	local sound = minetest.sound_play(sound, params)
-	local length = params.length
+	local length = params and params.length
 	if sound
 	and length
 	and length > 10 then
