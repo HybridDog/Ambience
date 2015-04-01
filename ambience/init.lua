@@ -508,168 +508,62 @@ end
 -- stops all sounds that are not in still_playing
 local stop_sound = function(still_playing, player)
 	local player_name = player:get_player_name()
+	local to_stop_list = {}
 	if still_playing.cave == nil then
-		local list = cave
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, cave)
 	end
 	if still_playing.cave_frequent == nil then
-		local list = cave_frequent
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, cave_frequent)
 	end
 	if still_playing.swimming_frequent == nil then
-		local list = swimming_frequent
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, swimming_frequent)
 	end
 	if still_playing.beach == nil then
-		local list = beach
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, beach)
 	end
 	if still_playing.beach_frequent == nil then
-		local list = beach_frequent
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, beach_frequent)
 	end
 	if still_playing.desert == nil then
-		local list = desert
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, desert)
 	end
 	if still_playing.desert_frequent == nil then
-		local list = desert_frequent
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, desert_frequent)
 	end
 	if still_playing.night == nil then
-		local list = night
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, night)
 	end
 	if still_playing.night_frequent == nil then
-		local list = night_frequent
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, night_frequent)
 	end
 	if still_playing.day == nil then
-		local list = day
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, day)
 	end
 	if still_playing.day_frequent == nil then
-		local list = day_frequent
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, day_frequent)
 	end
 	if still_playing.music == nil then
-		local list = music
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, music)
 	end
 	if still_playing.flowing_water == nil then
-		local list = flowing_water
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, flowing_water)
 	end
 	if still_playing.flowing_water2 == nil then
-		local list = flowing_water2
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, flowing_water2)
 	end
 	if still_playing.lava == nil then
-		local list = lava
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, lava)
 	end
 	if still_playing.lava2 == nil then
-		local list = lava2
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
+		table.insert(to_stop_list, lava2)
 	end
 	if still_playing.water == nil then
-		local list = water
+		table.insert(to_stop_list, water)
+	end
+	if still_playing.splashing_water == nil then
+		table.insert(to_stop_list, splashing_water)
+	end
+	for _,list in pairs(to_stop_list) do
 		if list.handler[player_name] ~= nil then
 			if list.on_stop ~= nil then
 				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
@@ -706,16 +600,6 @@ local stop_sound = function(still_playing, player)
 			if list.on_stop ~= nil then
 				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
 				played_on_start = false
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
-	end
-	if still_playing.splashing_water == nil then
-		local list = splashing_water
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
 			end
 			minetest.sound_stop(list.handler[player_name])
 			list.handler[player_name] = nil
