@@ -48,7 +48,6 @@ local music_volume = 0.3
 
 --End of Config
 ----------------------------------------------------------------------------------------------------
-local ambiences
 local counter=0--*****************
 local SOUNDVOLUME = 1
 local MUSICVOLUME = 0--0.4
@@ -56,10 +55,7 @@ local sound_vol = 1
 local last_x_pos = 0
 local last_y_pos = 0
 local last_z_pos = 0
-local node_under_feet
-local node_at_upper_body
-local node_at_lower_body
-local node_3_under_feet
+local node_under_feet, node_at_upper_body, node_at_lower_body, node_3_under_feet
 local played_on_start = false
 
 
@@ -229,20 +225,12 @@ local music = {
 	{name="echos", length=2*60+25, gain=music_volume}
 }
 
-local is_daytime = function()
-	local time = minetest.get_timeofday()
-	return (time > 0.2 and time < 0.8)
+
+local function nodes_in_range(pos, search_distance, node_name)
+	return #minetest.find_nodes_in_area(vector.subtract(pos, search_distance), vector.add(pos, search_distance), node_name)
 end
 
-local nodes_in_coords = function(minp, maxp, node_name)
-	return #minetest.find_nodes_in_area(minp, maxp, node_name)
-end
-
-local nodes_in_range = function(pos, search_distance, node_name)
-	return nodes_in_coords(vector.subtract(pos, search_distance), vector.add(pos, search_distance), node_name)
-end
-
-local atleast_nodes_in_grid = function(pos, search_distance, height, node_name, threshold)
+local function atleast_nodes_in_grid(pos, search_distance, height, node_name, threshold)
 	counter = counter +1
 	local totalnodes = 0
 	for _,ps in pairs({
@@ -253,19 +241,19 @@ local atleast_nodes_in_grid = function(pos, search_distance, height, node_name, 
 	}) do
 		local x1,z1 = unpack(ps[1])
 		local x2,z2 = unpack(ps[2])
-		local nodes = minetest.find_nodes_in_area({x=pos.x+x1, y=height, z=pos.z+z1}, {x=pos.x+x2, y=height, z=pos.z+z2}, node_name)
-		if #nodes >= threshold then
+		local nodesc = #(minetest.find_nodes_in_area({x=pos.x+x1, y=height, z=pos.z+z1}, {x=pos.x+x2, y=height, z=pos.z+z2}, node_name))
+		if nodesc >= threshold then
 			return true
 		end
-		totalnodes = totalnodes + #nodes
-	end
-	if totalnodes >= threshold*2 then
-		return true
+		totalnodes = totalnodes + nodesc
+		if totalnodes >= threshold*2 then
+			return true
+		end
 	end
 	return false
 end
 
-local get_immediate_nodes = function(pos)
+local function get_immediate_nodes(pos)
 	pos.y = pos.y-1
 	node_under_feet = minetest.get_node(pos).name
 	pos.y = pos.y-3
@@ -280,21 +268,19 @@ local get_immediate_nodes = function(pos)
 end
 
 
-local get_ambience = function(player)
-	local player_is_climbing = false
-	local player_is_descending = false
-	local player_is_moving_horiz = false
-	local standing_in_water = false
+local function get_ambience(player)
+	local player_is_climbing, player_is_descending, player_is_moving_horiz, standing_in_water
 	local pos = player:getpos()
 	get_immediate_nodes(pos)
 
-	if last_x_pos ~=pos.x or last_z_pos ~=pos.z then
+	if last_x_pos ~=pos.x
+	or last_z_pos ~=pos.z then
 		player_is_moving_horiz = true
 	end
-	if pos.y > last_y_pos+.5   then
+	if pos.y > last_y_pos+.5 then
 		player_is_climbing = true
 	end
-	if pos.y < last_y_pos-.5  then
+	if pos.y < last_y_pos-.5 then
 		player_is_descending = true
 	end
 
@@ -303,47 +289,50 @@ local get_ambience = function(player)
 	last_y_pos =pos.y
 
 	if string.find(node_at_upper_body, "default:water") then
+		local t = {water=water, water_frequent=water_frequent}
 		if music then
-			return {water=water, water_frequent=water_frequent, music=music}
-		else
-			return {water=water, water_frequent=water_frequent}
+			t.music = music
 		end
-	elseif node_at_upper_body == "air" then
-		if string.find(node_at_lower_body, "default:water") or string.find(node_under_feet, "default:water") then
-		    --minetest.chat_send_all("bottom counted as water")
-			--we found air at upperbody, and water at lower body.  Now there are 4 possibilities:
-			--Key: under feet, moving or not
-			--swimming 			w, m swimming
-			--walking in water  nw, m splashing
-			--treading water    w, nm  sloshing
-			--standing in water nw, nm	beach trumps, then sloshing
-			if player_is_moving_horiz then
-				if string.find(node_under_feet, "default:water") then
-					if music then
-						return {swimming_frequent=swimming_frequent, music=music}
-					else
-						return {swimming_frequent}
-					end
-				else --didn't find water under feet: walking in water
-					if music then
-						return {splashing_water=splashing_water, music=music}
-					else
-						return {splashing_water}
-					end
-				end
-			else--player is not moving: treading water
-				if string.find(node_under_feet, "default:water") then
-					if music then
-						return {water_surface=water_surface, music=music}
-					else
-						return {water_surface}
-					end
-				else --didn't find water under feet
-					standing_in_water = true
-				end
-		    end
-		end
+		return t
 	end
+
+	local on_water = string.find(node_under_feet, "default:water")
+	if node_at_upper_body == "air"
+	and (
+		string.find(node_at_lower_body, "default:water")
+		or on_water
+	) then
+		--minetest.chat_send_all("bottom counted as water")
+		--we found air at upperbody, and water at lower body.  Now there are 4 possibilities:
+		--Key: under feet, moving or not
+		--swimming 			w, m swimming
+		--walking in water  nw, m splashing
+		--treading water    w, nm  sloshing
+		--standing in water nw, nm	beach trumps, then sloshing
+		if player_is_moving_horiz then
+			if on_water then
+				if music then
+					return {swimming_frequent=swimming_frequent, music=music}
+				end
+				return {swimming_frequent}
+			end
+			--didn't find water under feet: walking in water
+			if music then
+				return {splashing_water=splashing_water, music=music}
+			end
+			return {splashing_water}
+		end
+		--player is not moving: treading water
+		if string.find(node_under_feet, "default:water") then
+			if music then
+				return {water_surface=water_surface, music=music}
+			end
+			return {water_surface}
+		end
+		--didn't find water under feet
+		standing_in_water = true
+	end
+	--[[
 --	minetest.chat_send_all("----------")
 --	if not player_is_moving_horiz then
 --		minetest.chat_send_all("not moving horiz")
@@ -388,46 +377,46 @@ local get_ambience = function(player)
 --		end
 --	end
 	--minetest.chat_send_all("not flying!!!!")
+	--]]
 
-	if nodes_in_range(pos, 7, "default:lava_flowing")>5 or nodes_in_range(pos, 7, "default:lava_source")>5 then
+	if nodes_in_range(pos, 7, "default:lava_flowing") > 5
+	or nodes_in_range(pos, 7, "default:lava_source") > 5 then
 		if music then
 			return {lava=lava, lava2=lava2, music=music}
-		else
-			return {lava=lava}
 		end
+		return {lava=lava}
 	end
-	if nodes_in_range(pos, 6, "default:water_flowing")>45 then
+	if nodes_in_range(pos, 6, "default:water_flowing") > 45 then
+		local t = {flowing_water=flowing_water, flowing_water2=flowing_water2}
 		if music then
-			return {flowing_water=flowing_water, flowing_water2=flowing_water2, music=music}
-		else
-			return {flowing_water=flowing_water, flowing_water2=flowing_water2}
+			t.music = music
 		end
+		return t
 	end
 
 
 --if we are near sea level and there is lots of water around the area
-	if pos.y < 7 and pos.y >0 and atleast_nodes_in_grid(pos, 60, 1, "default:water_source", 51 ) then
+	if pos.y < 7
+	and pos.y >0
+	and atleast_nodes_in_grid(pos, 60, 1, "default:water_source", 51 ) then
 		if music then
 			return {beach=beach, beach_frequent=beach_frequent, music=music}
-		else
-			return {beach=beach, beach_frequent=beach_frequent}
 		end
+		return {beach=beach, beach_frequent=beach_frequent}
 	end
 	if standing_in_water then
 		if music then
 			return {water_surface=water_surface, music=music}
-		else
-			return {water_surface}
 		end
+		return {water_surface}
 	end
 
 
-	if  (nodes_in_range(pos, 6, "default:desert_sand")+nodes_in_range(pos, 6, "default:desert_stone")) >250 then
+	if nodes_in_range(pos, 6, "default:desert_sand")+nodes_in_range(pos, 6, "default:desert_stone") >250 then
 		if music then
 			return {desert=desert, desert_frequent=desert_frequent, music=music}
-		else
-			return {desert=desert, desert_frequent=desert_frequent}
 		end
+		return {desert=desert, desert_frequent=desert_frequent}
 	end
 
 --	pos.y = pos.y-2
@@ -435,26 +424,27 @@ local get_ambience = function(player)
 --	minetest.chat_send_all("Found " .. nodename .. pos.y )
 
 
-	if player:getpos().y < 0 then
+	if pos.y < 0 then
 		if music then
 			return {cave=cave, cave_frequent=cave_frequent, music=music}
-		else
-			return {cave=cave, cave_frequent=cave_frequent}
 		end
+		return {cave=cave, cave_frequent=cave_frequent}
 	end
-	if is_daytime() then
+
+	local time = minetest.get_timeofday()
+	if time > 0.2
+	and time < 0.8 then
+		local t = {day=day, day_frequent=day_frequent}
 		if music then
-			return {day=day, day_frequent=day_frequent, music=music}
-		else
-			return {day=day, day_frequent=day_frequent}
+			t.music = music
 		end
-	else
-		if music then
-			return {night=night, night_frequent=night_frequent, music=music}
-		else
-			return {night=night, night_frequent=night_frequent}
-		end
+		return t
 	end
+	local t = {night=night, night_frequent=night_frequent}
+	if music then
+		t.music = music
+	end
+	return t
 end
 
 -- override the minetest.sound_play function
@@ -485,36 +475,38 @@ local function sound_play(sound, params)
 end
 
 -- start playing the sound, set the handler and delete the handler after sound is played
-local play_sound = function(player, list, number, is_music)
+local function play_sound(player, list, number, is_music)
 	local player_name = player:get_player_name()
-	if list.handler[player_name] == nil then
-		local gain = 1.0
-		if list[number].gain ~= nil then
-			if is_music then
-				gain = list[number].gain*MUSICVOLUME
-				--minetest.chat_send_all("gain music: " .. gain )
-			else
-				gain = list[number].gain*SOUNDVOLUME
-				--minetest.chat_send_all("gain sound: " .. gain )
-			end
-		end
-		local handler = sound_play(list[number].name, {to_player=player_name, gain=gain})
-		if handler ~= nil then
-			list.handler[player_name] = handler
-			minetest.after(list[number].length, function(args)
-				local list = args[1]
-				local player_name = args[2]
-				if list.handler[player_name] ~= nil then
-					minetest.sound_stop(list.handler[player_name])
-					list.handler[player_name] = nil
-				end
-			end, {list, player_name})
-		end
+	if list.handler[player_name] then
+		return
 	end
+	local gain = list[number].gain
+	if gain then
+		if is_music then
+			gain = gain*MUSICVOLUME
+			--minetest.chat_send_all("gain music: " .. gain )
+		else
+			gain = gain*SOUNDVOLUME
+			--minetest.chat_send_all("gain sound: " .. gain )
+		end
+	else
+		gain = 1
+	end
+	local handler = sound_play(list[number].name, {to_player=player_name, gain=gain})
+	if not handler then
+		return
+	end
+	list.handler[player_name] = handler
+	minetest.after(list[number].length, function(list, player_name)
+		if list.handler[player_name] then
+			minetest.sound_stop(list.handler[player_name])
+			list.handler[player_name] = nil
+		end
+	end, list, player_name)
 end
 
 -- stops all sounds that are not in still_playing
-local stop_sound = function(still_playing, player)
+local function stop_sound(still_playing, player)
 	local player_name = player:get_player_name()
 	local to_stop_list = {}
 	if still_playing.cave == nil then
@@ -602,10 +594,10 @@ local stop_sound = function(still_playing, player)
 			list.handler[player_name] = nil
 		end
 	end
-	if still_playing.flying == nil then
+	if not still_playing.flying then
 		local list = flying
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
+		if list.handler[player_name] then
+			if list.on_stop then
 				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
 				played_on_start = false
 			end
@@ -624,20 +616,17 @@ minetest.register_globalstep(function(dtime)
 	end
 	timer = 0
 
-	for _,player in ipairs(minetest.get_connected_players()) do
-		ambiences = get_ambience(player)
+	for _,player in pairs(minetest.get_connected_players()) do
+		local ambiences = get_ambience(player)
 		stop_sound(ambiences, player)
 		for _,ambience in pairs(ambiences) do
 			if math.random(1, 1000) <= ambience.frequency then
-				if ambience.on_start ~= nil and played_on_start == false then
+				if ambience.on_start
+				and not played_on_start then
 					played_on_start = true
 					sound_play(ambience.on_start, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
 				end
-				local is_music =false
-				if ambience.is_music ~= nil then
-					is_music = true
-				end
-				play_sound(player, ambience, math.random(1, #ambience),is_music)
+				play_sound(player, ambience, math.random(1, #ambience), ambience.is_music ~= nil)
 			end
 		end
 	end
