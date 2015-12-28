@@ -23,8 +23,8 @@ local day_frequency = 80  --crow, bluejay, cardinal
 local day_volume = 0.5
 local day_frequent_frequency = 250  --crow, bluejay, cardinal
 local day_frequent_volume = 0.18
-local cave_frequency = 10  --bats
-local cave_volume = 0.8
+local cave_frequency = 2  --bats
+local cave_volume = 0.1
 local cave_frequent_frequency = 70  --drops of water dripping
 local cave_frequent_volume = 0.8
 local beach_frequency = 20  --seagulls
@@ -442,17 +442,13 @@ local function play_sound(player, list, number, is_music)
 	if list.handler[player_name] then
 		return
 	end
-	local gain = list[number].gain
-	if gain then
-		if is_music then
-			gain = gain*MUSICVOLUME
-			--minetest.chat_send_all("gain music: " .. gain )
-		else
-			gain = gain*SOUNDVOLUME
-			--minetest.chat_send_all("gain sound: " .. gain )
-		end
+	local gain = list[number].gain or 1
+	if is_music then
+		gain = gain*MUSICVOLUME
+		--minetest.chat_send_all("gain music: " .. gain )
 	else
-		gain = 1
+		gain = gain*SOUNDVOLUME
+		--minetest.chat_send_all("gain sound: " .. gain )
 	end
 	local handler = sound_play(list[number].name, {to_player=player_name, gain=gain})
 	if not handler then
