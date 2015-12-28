@@ -50,7 +50,7 @@ local music_volume = 0.3
 ----------------------------------------------------------------------------------------------------
 local counter=0--*****************
 local SOUNDVOLUME = 1
-local MUSICVOLUME = 0--0.4
+local MUSICVOLUME = 0.4
 local sound_vol = 1
 local last_x_pos = 0
 local last_y_pos = 0
@@ -60,170 +60,172 @@ local played_on_start = false
 
 
 
+local sounds_data = {
 
-local night = {
-	handler = {},
-	frequency = night_frequency,
-	{name="horned_owl", length=3, gain=night_volume},
-	{name="Wolves_Howling", length=11,  gain=night_volume},
-	{name="ComboWind", length=17,  gain=night_volume}
-}
+	night = {
+		handler = {},
+		frequency = night_frequency,
+		{name="horned_owl", length=3, gain=night_volume},
+		{name="Wolves_Howling", length=11,  gain=night_volume},
+		{name="ComboWind", length=17,  gain=night_volume}
+	},
 
-local night_frequent = {
-	handler = {},
-	frequency = night_frequent_frequency,
-	{name="Crickets_At_NightCombo", length=69, gain=night_frequent_volume}
-}
+	night_frequent = {
+		handler = {},
+		frequency = night_frequent_frequency,
+		{name="Crickets_At_NightCombo", length=69, gain=night_frequent_volume}
+	},
 
-local day = {
-	handler = {},
-	frequency = day_frequency,
-	{name="Best Cardinal Bird", length=4, gain=day_volume},
-	{name="craw", length=3, gain=day_volume},
-	{name="bluejay", length=18, gain=day_volume},
-	{name="ComboWind", length=17,  gain=day_volume}
-}
+	day = {
+		handler = {},
+		frequency = day_frequency,
+		{name="Best Cardinal Bird", length=4, gain=day_volume},
+		{name="craw", length=3, gain=day_volume},
+		{name="bluejay", length=18, gain=day_volume},
+		{name="ComboWind", length=17,  gain=day_volume}
+	},
 
-local day_frequent = {
-	handler = {},
-	frequency = day_frequent_frequency,
-	{name="robin2", length=16, gain=day_frequent_volume},
-	{name="birdsongnl", length=13, gain=day_frequent_volume},
-	{name="bird", length=30, gain=day_frequent_volume},
-	{name="Best Cardinal Bird", length=4, gain=day_frequent_volume},
-	{name="craw", length=3, gain=day_frequent_volume},
-	{name="bluejay", length=18, gain=day_frequent_volume},
-	{name="ComboWind", length=17,  gain=day_frequent_volume*3}
-}
-local swimming_frequent = {
-	handler = {},
-	frequency = day_frequent_frequency,
-	{name="water_swimming_splashing_breath", length=11.5, gain=swimming_frequent_volume},
-	{name="water_swimming_splashing", length=9, gain=swimming_frequent_volume}
-}
+	day_frequent = {
+		handler = {},
+		frequency = day_frequent_frequency,
+		{name="robin2", length=16, gain=day_frequent_volume},
+		{name="birdsongnl", length=13, gain=day_frequent_volume},
+		{name="bird", length=30, gain=day_frequent_volume},
+		{name="Best Cardinal Bird", length=4, gain=day_frequent_volume},
+		{name="craw", length=3, gain=day_frequent_volume},
+		{name="bluejay", length=18, gain=day_frequent_volume},
+		{name="ComboWind", length=17,  gain=day_frequent_volume*3}
+	},
+	swimming_frequent = {
+		handler = {},
+		frequency = day_frequent_frequency,
+		{name="water_swimming_splashing_breath", length=11.5, gain=swimming_frequent_volume},
+		{name="water_swimming_splashing", length=9, gain=swimming_frequent_volume}
+	},
 
-local cave = {
-	handler = {},
-	frequency = cave_frequency,
-	{name="Bats_in_Cave", length=5, gain=cave_volume}
-}
+	cave = {
+		handler = {},
+		frequency = cave_frequency,
+		{name="Bats_in_Cave", length=5, gain=cave_volume}
+	},
 
-local cave_frequent = {
-	handler = {},
-	frequency = cave_frequent_frequency,
-	{name="drippingwater_drip_a", length=2, gain=cave_frequent_volume},
-	{name="drippingwater_drip_b", length=2, gain=cave_frequent_volume},
-	{name="drippingwater_drip_c", length=2, gain=cave_frequent_volume},
-	{name="Single_Water_Droplet", length=3, gain=cave_frequent_volume},
-	{name="Spooky_Water_Drops", length=7, gain=cave_frequent_volume}
-}
+	cave_frequent = {
+		handler = {},
+		frequency = cave_frequent_frequency,
+		{name="drippingwater_drip_a", length=2, gain=cave_frequent_volume},
+		{name="drippingwater_drip_b", length=2, gain=cave_frequent_volume},
+		{name="drippingwater_drip_c", length=2, gain=cave_frequent_volume},
+		{name="Single_Water_Droplet", length=3, gain=cave_frequent_volume},
+		{name="Spooky_Water_Drops", length=7, gain=cave_frequent_volume}
+	},
 
-local beach = {
-	handler = {},
-	frequency = beach_frequency,
-	{name="seagull", length=4.5, gain=beach_volume}
-}
+	beach = {
+		handler = {},
+		frequency = beach_frequency,
+		{name="seagull", length=4.5, gain=beach_volume}
+	},
 
-local beach_frequent = {
-	handler = {},
-	frequency = beach_frequent_frequency,
-	{name="fiji_beach", length=43.5, gain=beach_frequent_volume}
-}
+	beach_frequent = {
+		handler = {},
+		frequency = beach_frequent_frequency,
+		{name="fiji_beach", length=43.5, gain=beach_frequent_volume}
+	},
 
-local desert = {
-	handler = {},
-	frequency = desert_frequency,
-	{name="coyote2", length=2.5, gain=desert_volume},
-	{name="RattleSnake", length=8, gain=desert_volume}
-}
+	desert = {
+		handler = {},
+		frequency = desert_frequency,
+		{name="coyote2", length=2.5, gain=desert_volume},
+		{name="RattleSnake", length=8, gain=desert_volume}
+	},
 
-local desert_frequent = {
-	handler = {},
-	frequency = desert_frequent_frequency,
-	{name="DesertMonolithMed", length=34.5, gain=desert_frequent_volume}
-}
+	desert_frequent = {
+		handler = {},
+		frequency = desert_frequent_frequency,
+		{name="DesertMonolithMed", length=34.5, gain=desert_frequent_volume}
+	},
 
-local flying = {
-	handler = {},
-	frequency = 1000,
-	on_start = "nothing_yet",
-	on_stop = "nothing_yet",
-	{name="ComboWind", length=17,  gain=1}
-}
+	flying = {
+		handler = {},
+		frequency = 1000,
+		on_start = "nothing_yet",
+		on_stop = "nothing_yet",
+		{name="ComboWind", length=17,  gain=1}
+	},
 
-local water = {
-	handler = {},
-	frequency = 0,--dolphins dont fit into small lakes
-	{name="dolphins", length=6, gain=1},
-	{name="dolphins_screaming", length=16.5, gain=1}
-}
+	water = {
+		handler = {},
+		frequency = 0,--dolphins dont fit into small lakes
+		{name="dolphins", length=6, gain=1},
+		{name="dolphins_screaming", length=16.5, gain=1}
+	},
 
-local water_frequent = {
-	handler = {},
-	frequency = water_frequent_frequency,
-	on_stop = "drowning_gasp",
-	--on_start = "Splash",
-	{name="scuba1bubbles", length=11, gain=water_frequent_volume},
-	{name="scuba1calm", length=10, gain=water_frequent_volume},  --not sure why but sometimes I get errors when setting gain=water_frequent_volume here.
-	{name="scuba1calm2", length=8.5, gain=water_frequent_volume},
-	{name="scuba1interestingbubbles", length=11, gain=water_frequent_volume},
-	{name="scuba1tubulentbubbles", length=10.5, gain=water_frequent_volume}
-}
+	water_frequent = {
+		handler = {},
+		frequency = water_frequent_frequency,
+		on_stop = "drowning_gasp",
+		--on_start = "Splash",
+		{name="scuba1bubbles", length=11, gain=water_frequent_volume},
+		{name="scuba1calm", length=10, gain=water_frequent_volume},  --not sure why but sometimes I get errors when setting gain=water_frequent_volume here.
+		{name="scuba1calm2", length=8.5, gain=water_frequent_volume},
+		{name="scuba1interestingbubbles", length=11, gain=water_frequent_volume},
+		{name="scuba1tubulentbubbles", length=10.5, gain=water_frequent_volume}
+	},
 
-local water_surface = {
-	handler = {},
-	frequency = 1000,
-	on_stop = "Splash",
-	on_start = "Splash",
-	{name="lake_waves_2_calm", length=9.5, gain=water_surface_volume},
-	{name="lake_waves_2_variety", length=13.1, gain=water_surface_volume}
-}
-local splashing_water = {
-	handler = {},
-	frequency = 1000,
-	{name="Splash", length=1.22, gain=splashing_water_volume}
-}
+	water_surface = {
+		handler = {},
+		frequency = 1000,
+		on_stop = "Splash",
+		on_start = "Splash",
+		{name="lake_waves_2_calm", length=9.5, gain=water_surface_volume},
+		{name="lake_waves_2_variety", length=13.1, gain=water_surface_volume}
+	},
+	splashing_water = {
+		handler = {},
+		frequency = 1000,
+		{name="Splash", length=1.22, gain=splashing_water_volume}
+	},
 
-local flowing_water = {
-	handler = {},
-	frequency = 1000,
-	{name="small_waterfall", length=14, gain=flowing_water_volume}
-}
-local flowing_water2 = {
-	handler = {},
-	frequency = 1000,
-	{name="small_waterfall", length=11, gain=flowing_water_volume}
-}
+	flowing_water = {
+		handler = {},
+		frequency = 1000,
+		{name="small_waterfall", length=14, gain=flowing_water_volume}
+	},
+	flowing_water2 = {
+		handler = {},
+		frequency = 1000,
+		{name="small_waterfall", length=11, gain=flowing_water_volume}
+	},
 
-local lava = {
-	handler = {},
-	frequency = 1000,
-	{name="earth01a", length=20, gain=lava_volume}
-}
-local lava2 = {
-	handler = {},
-	frequency = 1000,
-	{name="earth01a", length=15, gain=lava_volume}
-}
+	lava = {
+		handler = {},
+		frequency = 1000,
+		{name="earth01a", length=20, gain=lava_volume}
+	},
+	lava2 = {
+		handler = {},
+		frequency = 1000,
+		{name="earth01a", length=15, gain=lava_volume}
+	},
 
+	music = {
+		handler = {},
+		frequency = music_frequency,
+		is_music=true,
+		{name="StrangelyBeautifulShort", length=3*60+.5, gain=music_volume*.7},
+		{name="AvalonShort", length=2*60+58, gain=music_volume*1.4},
+		--{name="mtest", length=4*60+33, gain=music_volume},
+		--{name="echos", length=2*60+26, gain=music_volume},
+		--{name="FoamOfTheSea", length=1*60+50, gain=music_volume},
+		{name="eastern_feeling", length=3*60+51, gain=music_volume},
+		--{name="Mass_Effect_Uncharted_Worlds", length=2*60+29, gain=music_volume},
+		{name="EtherealShort", length=3*60+4, gain=music_volume*.7},
+		{name="FarawayShort", length=3*60+5, gain=music_volume*.7},
+		{name="dark_ambiance", length=44, gain=music_volume},
+		{name="echos", length=2*60+25, gain=music_volume}
+	},
+}
 
 local play_music = minetest.setting_getbool("music") or false
-local music = {
-	handler = {},
-	frequency = music_frequency,
-	is_music=true,
-	{name="StrangelyBeautifulShort", length=3*60+.5, gain=music_volume*.7},
-	{name="AvalonShort", length=2*60+58, gain=music_volume*1.4},
-	--{name="mtest", length=4*60+33, gain=music_volume},
-	--{name="echos", length=2*60+26, gain=music_volume},
-	--{name="FoamOfTheSea", length=1*60+50, gain=music_volume},
-	{name="eastern_feeling", length=3*60+51, gain=music_volume},
-	--{name="Mass_Effect_Uncharted_Worlds", length=2*60+29, gain=music_volume},
-	{name="EtherealShort", length=3*60+4, gain=music_volume*.7},
-	{name="FarawayShort", length=3*60+5, gain=music_volume*.7},
-	{name="dark_ambiance", length=44, gain=music_volume},
-	{name="echos", length=2*60+25, gain=music_volume}
-}
 
 
 local function nodes_in_range(pos, search_distance, node_name)
@@ -289,11 +291,7 @@ local function get_ambience(player)
 	last_y_pos =pos.y
 
 	if string.find(node_at_upper_body, "default:water") then
-		local t = {water=water, water_frequent=water_frequent}
-		if music then
-			t.music = music
-		end
-		return t
+		return {water=true, water_frequent=true}
 	end
 
 	local on_water = string.find(node_under_feet, "default:water")
@@ -311,23 +309,14 @@ local function get_ambience(player)
 		--standing in water nw, nm	beach trumps, then sloshing
 		if player_is_moving_horiz then
 			if on_water then
-				if music then
-					return {swimming_frequent=swimming_frequent, music=music}
-				end
-				return {swimming_frequent}
+				return {swimming_frequent=true}
 			end
 			--didn't find water under feet: walking in water
-			if music then
-				return {splashing_water=splashing_water, music=music}
-			end
-			return {splashing_water}
+			return {splashing_water=true}
 		end
 		--player is not moving: treading water
 		if string.find(node_under_feet, "default:water") then
-			if music then
-				return {water_surface=water_surface, music=music}
-			end
-			return {water_surface}
+			return {water_surface=true}
 		end
 		--didn't find water under feet
 		standing_in_water = true
@@ -381,17 +370,10 @@ local function get_ambience(player)
 
 	if nodes_in_range(pos, 7, "default:lava_flowing") > 5
 	or nodes_in_range(pos, 7, "default:lava_source") > 5 then
-		if music then
-			return {lava=lava, lava2=lava2, music=music}
-		end
-		return {lava=lava}
+		return {lava=true, lava2=true}
 	end
 	if nodes_in_range(pos, 6, "default:water_flowing") > 45 then
-		local t = {flowing_water=flowing_water, flowing_water2=flowing_water2}
-		if music then
-			t.music = music
-		end
-		return t
+		return {flowing_water=true, flowing_water2=true}
 	end
 
 
@@ -399,24 +381,15 @@ local function get_ambience(player)
 	if pos.y < 7
 	and pos.y >0
 	and atleast_nodes_in_grid(pos, 60, 1, "default:water_source", 51 ) then
-		if music then
-			return {beach=beach, beach_frequent=beach_frequent, music=music}
-		end
-		return {beach=beach, beach_frequent=beach_frequent}
+		return {beach=true, beach_frequent=true}
 	end
 	if standing_in_water then
-		if music then
-			return {water_surface=water_surface, music=music}
-		end
-		return {water_surface}
+		return {water_surface=true}
 	end
 
 
 	if nodes_in_range(pos, 6, "default:desert_sand")+nodes_in_range(pos, 6, "default:desert_stone") >250 then
-		if music then
-			return {desert=desert, desert_frequent=desert_frequent, music=music}
-		end
-		return {desert=desert, desert_frequent=desert_frequent}
+		return {desert=true, desert_frequent=true}
 	end
 
 --	pos.y = pos.y-2
@@ -425,26 +398,15 @@ local function get_ambience(player)
 
 
 	if pos.y < 0 then
-		if music then
-			return {cave=cave, cave_frequent=cave_frequent, music=music}
-		end
-		return {cave=cave, cave_frequent=cave_frequent}
+		return {cave=true, cave_frequent=true}
 	end
 
 	local time = minetest.get_timeofday()
 	if time > 0.2
 	and time < 0.8 then
-		local t = {day=day, day_frequent=day_frequent}
-		if music then
-			t.music = music
-		end
-		return t
+		return {day=true, day_frequent=true}
 	end
-	local t = {night=night, night_frequent=night_frequent}
-	if music then
-		t.music = music
-	end
-	return t
+	return {night=true, night_frequent=true}
 end
 
 -- override the minetest.sound_play function
@@ -508,104 +470,21 @@ end
 -- stops all sounds that are not in still_playing
 local function stop_sound(still_playing, player)
 	local player_name = player:get_player_name()
-	local to_stop_list = {}
-	if still_playing.cave == nil then
-		table.insert(to_stop_list, cave)
-	end
-	if still_playing.cave_frequent == nil then
-		table.insert(to_stop_list, cave_frequent)
-	end
-	if still_playing.swimming_frequent == nil then
-		table.insert(to_stop_list, swimming_frequent)
-	end
-	if still_playing.beach == nil then
-		table.insert(to_stop_list, beach)
-	end
-	if still_playing.beach_frequent == nil then
-		table.insert(to_stop_list, beach_frequent)
-	end
-	if still_playing.desert == nil then
-		table.insert(to_stop_list, desert)
-	end
-	if still_playing.desert_frequent == nil then
-		table.insert(to_stop_list, desert_frequent)
-	end
-	if still_playing.night == nil then
-		table.insert(to_stop_list, night)
-	end
-	if still_playing.night_frequent == nil then
-		table.insert(to_stop_list, night_frequent)
-	end
-	if still_playing.day == nil then
-		table.insert(to_stop_list, day)
-	end
-	if still_playing.day_frequent == nil then
-		table.insert(to_stop_list, day_frequent)
-	end
-	if still_playing.music == nil then
-		table.insert(to_stop_list, music)
-	end
-	if still_playing.flowing_water == nil then
-		table.insert(to_stop_list, flowing_water)
-	end
-	if still_playing.flowing_water2 == nil then
-		table.insert(to_stop_list, flowing_water2)
-	end
-	if still_playing.lava == nil then
-		table.insert(to_stop_list, lava)
-	end
-	if still_playing.lava2 == nil then
-		table.insert(to_stop_list, lava2)
-	end
-	if still_playing.water == nil then
-		table.insert(to_stop_list, water)
-	end
-	if still_playing.splashing_water == nil then
-		table.insert(to_stop_list, splashing_water)
-	end
-	for _,list in pairs(to_stop_list) do
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
-	end
-	if still_playing.water_surface == nil then
-		local list = water_surface
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-				played_on_start = false
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
-	end
-	if still_playing.water_frequent == nil then
-		local list = water_frequent
-		if list.handler[player_name] ~= nil then
-			if list.on_stop ~= nil then
-				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-				played_on_start = false
-			end
-			minetest.sound_stop(list.handler[player_name])
-			list.handler[player_name] = nil
-		end
-	end
-	if not still_playing.flying then
-		local list = flying
-		if list.handler[player_name] then
+	for i,list in pairs(sounds_data) do
+		if not still_playing[i]
+		and list.handler[player_name] then
 			if list.on_stop then
 				sound_play(list.on_stop, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
-				played_on_start = false
+				if i == "water_surface"
+				or i == "water_frequent"
+				or i == "flying" then
+					played_on_start = false
+				end
 			end
 			minetest.sound_stop(list.handler[player_name])
 			list.handler[player_name] = nil
 		end
 	end
-
 end
 
 local timer = 0
@@ -618,13 +497,16 @@ minetest.register_globalstep(function(dtime)
 
 	for _,player in pairs(minetest.get_connected_players()) do
 		local ambiences = get_ambience(player)
+		ambiences.music = true
 		stop_sound(ambiences, player)
-		for _,ambience in pairs(ambiences) do
+		local pname = player:get_player_name()
+		for i in pairs(ambiences) do
+			local ambience = sounds_data[i]
 			if math.random(1, 1000) <= ambience.frequency then
 				if ambience.on_start
 				and not played_on_start then
 					played_on_start = true
-					sound_play(ambience.on_start, {to_player=player:get_player_name(),gain=SOUNDVOLUME})
+					sound_play(ambience.on_start, {to_player=pname, gain=SOUNDVOLUME})
 				end
 				play_sound(player, ambience, math.random(1, #ambience), ambience.is_music ~= nil)
 			end
@@ -636,9 +518,14 @@ minetest.register_chatcommand("svol", {
 	params = "<svol>",
 	description = "set volume of sounds, default 1 normal volume.",
 	privs = {server=true},
-	func = function(name, param)
-		SOUNDVOLUME = param
-		minetest.chat_send_player(name, "Sound volume set.")
+	func = function(name, volume)
+		volume = tonumber(volume)
+		if not volume then
+			minetest.chat_send_player(name, "Sound volume is "..volume)
+			return
+		end
+		SOUNDVOLUME = volume
+		minetest.chat_send_player(name, "Sound volume set to "..volume)
 	end,
 })
 
@@ -646,8 +533,13 @@ minetest.register_chatcommand("mvol", {
 	params = "<mvol>",
 	description = "set volume of music, default 1 normal volume.",
 	privs = {server=true},
-	func = function(name, param)
-		MUSICVOLUME = param
-		minetest.chat_send_player(name, "Music volume set.")
+	func = function(name, volume)
+		volume = tonumber(volume)
+		if not volume then
+			minetest.chat_send_player(name, "Music volume is "..volume)
+			return
+		end
+		MUSICVOLUME = volume
+		minetest.chat_send_player(name, "Music volume set to "..volume)
 	end,
 })
